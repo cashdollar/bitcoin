@@ -41,7 +41,7 @@
 #include <openssl/rand.h>
 #include <openssl/sha.h>
 #include <openssl/ripemd.h>
-#include <db_cxx.h>
+#include <db48/db_cxx.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>

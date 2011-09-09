@@ -11,7 +11,7 @@
 #include <string>
 #include <vector>
 
-#include <db_cxx.h>
+#include <db48/db_cxx.h>
 
 class CTxIndex;
 class CDiskBlockIndex;

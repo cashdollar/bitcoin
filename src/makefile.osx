@@ -6,7 +6,7 @@
 # Laszlo Hanyecz (solar@heliacal.net)
 
 CXX=llvm-g++
-DEPSDIR=/Users/macosuser/bitcoin/deps
+DEPSDIR=/opt/local
 
 INCLUDEPATHS= \
  -I"$(DEPSDIR)/include"
@@ -14,24 +14,25 @@ INCLUDEPATHS= \
 LIBPATHS= \
  -L"$(DEPSDIR)/lib"
 
-WXLIBS=$(shell $(DEPSDIR)/bin/wx-config --libs --static)
+WXLIBS=$(shell $(DEPSDIR)/bin/wx-config --libs)
 
-USE_UPNP:=0
+USE_UPNP=0
 
 LIBS= -dead_strip \
- $(DEPSDIR)/lib/libdb_cxx-4.8.a \
+ $(DEPSDIR)/lib/db48/libdb_cxx-4.8.a \
  $(DEPSDIR)/lib/libboost_system.a \
  $(DEPSDIR)/lib/libboost_filesystem.a \
  $(DEPSDIR)/lib/libboost_program_options.a \
- $(DEPSDIR)/lib/libboost_thread.a \
+ $(DEPSDIR)/lib/libboost_thread-mt.a \
  $(DEPSDIR)/lib/libssl.a \
- $(DEPSDIR)/lib/libcrypto.a 
+ $(DEPSDIR)/lib/libcrypto.a \
+ $(DEPSDIR)/lib/libz.a
 
 DEFS=$(shell $(DEPSDIR)/bin/wx-config --cxxflags) -D__WXMAC_OSX__ -DNOPCH -DMSG_NOSIGNAL=0 -DUSE_SSL
 
 DEBUGFLAGS=-g -DwxDEBUG_LEVEL=0
 # ppc doesn't work because we don't support big-endian
-CFLAGS=-mmacosx-version-min=10.5 -arch i386 -arch x86_64 -O3 -Wno-invalid-offsetof -Wformat $(DEBUGFLAGS) $(DEFS) $(INCLUDEPATHS)
+CFLAGS=-mmacosx-version-min=10.5 -arch x86_64 -O3 -Wno-invalid-offsetof -Wformat $(DEBUGFLAGS) $(DEFS) $(INCLUDEPATHS)
 HEADERS = \
     base58.h \
     bignum.h \
@@ -72,7 +73,7 @@ OBJS= \
     cryptopp/obj/sha.o \
     cryptopp/obj/cpu.o
 
-ifdef USE_UPNP
+ifneq ($(USE_UPNP),0)
 	LIBS += $(DEPSDIR)/lib/libminiupnpc.a
 	DEFS += -DUSE_UPNP=$(USE_UPNP)
 endif
@@ -101,7 +102,7 @@ obj/test/test_bitcoin.o: $(wildcard test/*.cpp) $(HEADERS)
 	$(CXX) -c $(CFLAGS) -o $@ test/test_bitcoin.cpp
 
 test_bitcoin: obj/test/test_bitcoin.o $(filter-out obj/nogui/init.o,$(OBJS:obj/%=obj/nogui/%))
-	$(CXX) $(CFLAGS) -o $@ $(LIBPATHS) $^ $(LIBS) -lboost_unit_test_framework
+	$(CXX) $(CFLAGS) -o $@ $(LIBPATHS) $^ $(LIBS) /opt/local/lib/libboost_unit_test_framework-mt.a -lboost_unit_test_framework-mt
 
 clean:
 	-rm -f bitcoin bitcoind test_bitcoin
